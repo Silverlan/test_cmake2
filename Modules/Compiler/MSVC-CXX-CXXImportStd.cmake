@@ -9,6 +9,7 @@ function (_cmake_cxx_find_modules_json)
       "$ENV{VCToolsInstallDir}/modules"
     PATHS
       "$ENV{INCLUDE}"
+	${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}
       "${CMAKE_CXX_COMPILER}/../../.."
       "${CMAKE_CXX_COMPILER}/../.."    # msvc-wine layout
     PATH_SUFFIXES

@@ -210,7 +210,11 @@ function(cmake_cxx_find_modules_json)
   endif ()
 
   # Check if the compiler understands how to `import std;`.
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    include("${CMAKE_ROOT}/Modules/Compiler/MSVC-CXX-CXXImportStd.cmake" OPTIONAL RESULT_VARIABLE _cmake_import_std_res)
+  else()
   include("${CMAKE_ROOT}/Modules/Compiler/${CMAKE_CXX_COMPILER_ID}-CXX-CXXImportStd.cmake" OPTIONAL RESULT_VARIABLE _cmake_import_std_res)
+  endif ()
   if (NOT _cmake_import_std_res)
     set(CMAKE_CXX_COMPILER_IMPORT_STD_ERROR_MESSAGE "Toolchain does not support discovering module metadata" PARENT_SCOPE)
     return ()

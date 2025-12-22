@@ -27,6 +27,12 @@ jobs:
           cd build
           cmake --build .
 
+      - name: Install
+        shell: bash
+        run: |
+          cd build
+          cmake --install .
+
       - name: Create Release Archive
         shell: bash
         run: |

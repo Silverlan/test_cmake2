@@ -1,0 +1,67 @@
+name: Build CMake (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-cmake-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure
+        shell: bash
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -S .. -DCMAKE_INSTALL_PREFIX:PATH=../install
+
+      - name: Build
+        shell: bash
+        run: |
+          cd build
+          cmake --build .
+
+      - name: Create Release Archive
+        shell: bash
+        run: |
+          mv install "cmake.git-Windows-X64"
+          tar --warning=no-file-changed -cf - cmake.git-Windows-X64 \
+            | xz -9e -T0 > windows_x64.tar.xz
+
+      - name: Generate nightly tag description
+        shell: bash
+        run: |
+          printf "Pre-built binaries for the latest version of CMake." > tag_text.txt
+
+      - name: Compute build-tag as today's date
+        id: get_date
+        shell: bash
+        run: |
+          echo "date=$(TZ='Europe/Berlin' date +%F)" >> $GITHUB_OUTPUT
+
+      - name: Create Tag
+        uses: Silverlan/common_actions/create_tag@main
+        with:
+          tag_name: "${{ steps.get_date.outputs.date }}"
+          path: "."
+
+      - name: Update nightly tag description
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          body_path: tag_text.txt
+          tag_name: "${{ steps.get_date.outputs.date }}"
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+
+      - name: Update nightly release
+        uses: pyTooling/Actions/releaser/composite@v4.2.2
+        with:
+          tag: "${{ steps.get_date.outputs.date }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: "windows_x64.tar.xz"

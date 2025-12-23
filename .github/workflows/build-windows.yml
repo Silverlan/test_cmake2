@@ -53,7 +53,7 @@ jobs:
         id: get_date
         shell: bash
         run: |
-          echo "date=$(TZ='Europe/Berlin' date +%F)_2" >> $GITHUB_OUTPUT
+          echo "date=$(TZ='Europe/Berlin' date +%F)_3" >> $GITHUB_OUTPUT
 
       - name: Create Tag
         uses: Silverlan/common_actions/create_tag@main
